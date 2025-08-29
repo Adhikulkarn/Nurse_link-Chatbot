@@ -6,6 +6,7 @@ import uuid
 from ibm_watsonx_ai import Credentials
 from ibm_watsonx_ai.foundation_models import ModelInference
 import numpy as np
+import random
 
 # ---------------- IBM Watsonx Setup ----------------
 IBM_API_KEY = "3_x81uevOQViOQHejEHm1kzxrofJ8rwCris9u3dm2hg7"
@@ -55,7 +56,24 @@ def retrieve_chunks(query, embed_model, chunks, faiss_index, k=3):
     _, indices = faiss_index.search(q_vec, k)
     return [chunks[i] for i in indices[0]]
 
+# ---------------- Greeting Setup ----------------
+GREETING_KEYWORDS = ["hi", "hello", "hey", "greetings", "good morning", "good afternoon", "good evening"]
+GREETING_RESPONSES = [
+    "Hello! How can I assist you today?",
+    "Hi there! Need help with anything?",
+    "Hey! What can I do for you?",
+    "Greetings! How can I help you today?"
+]
+
+# ---------------- Answer Generation ----------------
 def generate_answer(query, context):
+    q_lower = query.lower().strip()
+
+    # Check for greeting
+    if any(word in q_lower for word in GREETING_KEYWORDS):
+        return random.choice(GREETING_RESPONSES)
+
+    # Normal PDF-based RAG response
     prompt = f"Answer the user's question using ONLY the context below:\n\nCONTEXT:\n{context}\n\nQUESTION: {query}\nAnswer:"
     try:
         response = model.generate_text(prompt=prompt)
@@ -136,12 +154,10 @@ h1 {
     padding: 6px 12px;
     margin-top: 5px;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
 st.markdown("<h1 style='text-align:center'>NurseLink Help-Bot</h1>", unsafe_allow_html=True)
-st.markdown("<p style='text-align:center; color: var(--text-gray)'></p>", unsafe_allow_html=True)
 st.markdown("---")
 
 # ---------------- Load PDF and build index at startup ----------------
