@@ -74,7 +74,7 @@ def generate_answer(query, context):
         return random.choice(GREETING_RESPONSES)
 
     # Normal PDF-based RAG response
-    prompt = f"Answer the user's question using ONLY the context below:\n\nCONTEXT:\n{context}\n\nQUESTION: {query}\nAnswer:"
+    prompt = f"Answer the user's question using ONLY the context and also keep your answers short do not reply in huge paragraphs:\n\nCONTEXT:\n{context}\n\nQUESTION: {query}\nAnswer:"
     try:
         response = model.generate_text(prompt=prompt)
         if isinstance(response, dict):
